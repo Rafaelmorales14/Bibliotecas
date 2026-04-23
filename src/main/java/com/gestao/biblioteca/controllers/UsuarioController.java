@@ -52,7 +52,7 @@ public class UsuarioController {
         if(service.getById(id).isEmpty()){
             return ResponseEntity.notFound().build();
         }
-
+        service.delete(id);
         return ResponseEntity.noContent().build();
     }
 
