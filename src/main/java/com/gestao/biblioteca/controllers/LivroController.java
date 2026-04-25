@@ -55,7 +55,7 @@ public class LivroController {
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<LivroModel> put(@RequestBody LivroModel livro, @PathVariable Long id) {
         if (service.getById(id).isEmpty()) {
             return ResponseEntity.notFound().build();

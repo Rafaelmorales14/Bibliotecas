@@ -29,6 +29,8 @@ public class LivroModel {
     private String isbn;
     private LocalDateTime dataPublicacao;
     private LocalDateTime dataExclusao;
+
+    @Enumerated(EnumType.STRING)
     private CategoriaEnum categoria;
 
     @OneToMany(mappedBy = "livro")
