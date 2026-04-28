@@ -2,6 +2,8 @@ package com.gestao.biblioteca.services;
 
 import com.gestao.biblioteca.models.EmprestimoModel;
 import com.gestao.biblioteca.repositories.EmprestimoRepository;
+import com.gestao.biblioteca.repositories.LivroRepository;
+import com.gestao.biblioteca.repositories.UsuarioRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
