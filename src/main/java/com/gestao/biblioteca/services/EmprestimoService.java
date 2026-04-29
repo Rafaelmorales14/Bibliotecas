@@ -1,41 +1,67 @@
 package com.gestao.biblioteca.services;
 
 import com.gestao.biblioteca.models.EmprestimoModel;
+import com.gestao.biblioteca.models.LivroModel;
+import com.gestao.biblioteca.models.UsuarioModel;
+import com.gestao.biblioteca.models.enums.StatusEnum;
 import com.gestao.biblioteca.repositories.EmprestimoRepository;
 import com.gestao.biblioteca.repositories.LivroRepository;
 import com.gestao.biblioteca.repositories.UsuarioRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class EmprestimoService {
 
-    private final EmprestimoRepository repository;
+    private final EmprestimoRepository emprestimoRepository;
+    private final LivroRepository livroRepository;
+    private final UsuarioRepository usuarioRepository;
 
-    public EmprestimoService(EmprestimoRepository repository) {
-        this.repository = repository;
+    public EmprestimoService(EmprestimoRepository emprestimoRepository, LivroRepository livroRepository, UsuarioRepository usuarioRepository) {
+        this.emprestimoRepository = emprestimoRepository;
+        this.livroRepository = livroRepository;
+        this.usuarioRepository = usuarioRepository;
+
     }
+    public EmprestimoModel post(Long livroId, Long usuarioId) {
+        if(emprestimoRepository.existsByLivroIdAndStatus(livroId, StatusEnum.ATIVO)) {
+            throw new RuntimeException("Livro já emprestado");
+        }
+        // colocar validação do status dentro da validação se existe livro
+        LivroModel livroModel = livroRepository.
+                findById(livroId).
+                orElseThrow(() -> new RuntimeException("Livro não encontrado"));
 
-    public EmprestimoModel post(EmprestimoModel emprestimo) {
-        return repository.save(emprestimo);
+        UsuarioModel usuarioModel = usuarioRepository.
+                findById(usuarioId).
+                orElseThrow(()-> new RuntimeException("Usuário não encontrado"));
+
+        EmprestimoModel emprestimo = new EmprestimoModel();
+        emprestimo.setUsuario(usuarioModel);
+        emprestimo.setLivro(livroModel);
+        emprestimo.setDataEmprestimo(LocalDateTime.now());
+        emprestimo.setStatus(StatusEnum.ATIVO);
+
+        return emprestimoRepository.save(emprestimo);
     }
 
     public List<EmprestimoModel> getAll(){
-        return repository.findAll();
+        return emprestimoRepository.findAll();
     }
 
     public Optional<EmprestimoModel> getById(Long id) {
-        return repository.findById(id);
+        return emprestimoRepository.findById(id);
     }
 
     public void delete(Long id) {
-        repository.deleteById(id);
+        emprestimoRepository.deleteById(id);
     }
 
     public EmprestimoModel put(EmprestimoModel emprestimo, Long id) {
-        EmprestimoModel emprestimoExistente = repository.
+        EmprestimoModel emprestimoExistente = emprestimoRepository.
                 findById(id).
                 orElseThrow(()-> new RuntimeException("Emprestimo não encontrado"));
 
@@ -43,6 +69,6 @@ public class EmprestimoService {
         emprestimoExistente.setLivro(emprestimo.getLivro());
         emprestimoExistente.setStatus(emprestimo.getStatus());
 
-        return repository.save(emprestimoExistente);
+        return emprestimoRepository.save(emprestimoExistente);
     }
 }
